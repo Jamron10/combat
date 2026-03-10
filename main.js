@@ -3,6 +3,25 @@
 const ADMIN_IDS = [5730406030]; 
 
 // --- Game Configuration ---
+const StorageHelper = {
+  async getItem(key) {
+    if (window.location.hostname.includes('miniapps.ai') && window.miniappsAI && window.miniappsAI.storage) {
+      try { return await window.miniappsAI.storage.getItem(key); } catch(e) {}
+    }
+    return localStorage.getItem(key);
+  },
+  async setItem(key, value) {
+    if (window.location.hostname.includes('miniapps.ai') && window.miniappsAI && window.miniappsAI.storage) {
+      try { await window.miniappsAI.storage.setItem(key, value); return; } catch(e) {}
+    }
+    localStorage.setItem(key, value);
+  }
+};
+
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname.includes('render.com'))
+  ? '/api' 
+  : 'https://combat.onrender.com/api';
+
 const CONFIG = {
   maxOfflineHours: 3, 
   energyRechargeRate: 1, 
@@ -1100,12 +1119,20 @@ const AdminPanel = {
   
   mockData: {
     users: [
+      { id: 123456789, name: 'Tether Whale', balance: 1500000.5, status: 'active', registered: '01.03.2024', profitPerHour: 12500, tapValue: 0.05, totalEarned: 2500000, referrals: 12, cardsCount: 24, tasksCount: 10 },
+      { id: 987654321, name: 'Crypto King', balance: 500.12, status: 'active', registered: '10.03.2024', profitPerHour: 150, tapValue: 0.001, totalEarned: 600, referrals: 2, cardsCount: 3, tasksCount: 1 },
+      { id: 555666777, name: 'Scammer123', balance: 0, status: 'banned', registered: '05.03.2024', profitPerHour: 0, tapValue: 0.0001, totalEarned: 10, referrals: 0, cardsCount: 0, tasksCount: 0 }
     ],
     promos: [
+      { code: 'WHALE', reward: 50, current: 120, max: 500 }
     ],
-    finance: 
+    finance: [
+      { id: 101, type: 'withdraw', user: 'Crypto King', userId: 987654321, amount: 15000, wallet: 'EQAwH...yowA', network: 'TON', status: 'pending' },
+      { id: 102, type: 'withdraw', user: 'Tether Whale', userId: 123456789, amount: 5000, wallet: '0x123...abc', network: 'ERC20', status: 'approved' },
+      { id: 103, type: 'withdraw', user: 'Scammer123', userId: 555666777, amount: 100000, wallet: 'Txxxx...zzzz', network: 'TRC20', status: 'rejected' }
     ],
     activity: [
+      { text: '@Crypto_King подал заявку на вывод 15,000 ₮', time: '5 мин назад', icon: 'fa-arrow-right-arrow-left', color: 'text-orange-400' }
     ]
   },
   financeMode: 'withdraw',
@@ -1992,7 +2019,7 @@ setInterval(() => {
 
 async function loadState() {
   try {
-    const saved = await window.miniappsAI.storage.getItem('gameStateV7');
+    const saved = await StorageHelper.getItem('gameStateV7');
     if (saved) {
       const parsed = JSON.parse(saved);
       state = { ...state, ...parsed };
@@ -2079,6 +2106,37 @@ async function loadState() {
     updateLevelStatus();
   }
   initReferralUI();
+
+  // Асинхронно стягиваем данные с бэкенда (чтобы НЕ останавливать загрузку UI, пока сервер Render "просыпается")
+  if (state.userId) {
+    fetch(`${API_BASE}/user/${state.userId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.user) {
+          const u = data.user;
+          // Обновляем прогресс, только если на сервере он выше или равен локальному (не затираем локальный)
+          if (u.totalEarned > 0 && u.totalEarned >= state.totalEarned) {
+            state.balance = u.balance || state.balance;
+            state.totalEarned = u.totalEarned || state.totalEarned;
+            state.profitPerHour = u.profitPerHour || state.profitPerHour;
+            state.tapValue = u.tapValue || state.tapValue;
+            state.energy = u.energy || state.energy;
+            state.maxEnergy = u.maxEnergy || state.maxEnergy;
+            if (u.upgrades && Object.keys(u.upgrades).length > 0) state.upgrades = u.upgrades;
+            if (u.completedTasks && u.completedTasks.length > 0) state.completedTasks = u.completedTasks;
+            
+            // Мгновенно обновляем интерфейс после загрузки данных
+            calculateTotalPPH();
+            updateLevelStatus();
+            updateUI();
+            if(els.upgradesContainer) els.upgradesContainer.dataset.renderedCat = '';
+            renderUpgrades();
+            renderUserTasks();
+          }
+        }
+      })
+      .catch(err => console.warn('API sync failed or server sleeping:', err));
+  }
 }
 
 function renderFriends() {
@@ -2150,7 +2208,18 @@ async function saveState() {
     state.categoryNames = CATEGORY_NAMES;
     state.tasksDB = TASKS_DB;
     state.taskCategories = TASK_CATEGORIES;
-    await window.miniappsAI.storage.setItem('gameStateV7', JSON.stringify(state));
+    await StorageHelper.setItem('gameStateV7', JSON.stringify(state));
+    
+    // Sync to backend
+    if (state.userId) {
+      try {
+        fetch(`${API_BASE}/user/sync`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ telegramId: state.userId, state: state })
+        });
+      } catch (e) {}
+    }
   } catch (e) { console.error("Save fail", e); }
 }
 
