@@ -190,7 +190,7 @@ app.listen(PORT, () => {
 // 5. Инициализация Telegram Бота (Telegraf)
 // ==========================================
 const bot = new Telegraf('8318713550:AAHx6Itvy587qVLgTz9vC1c2dEF5ELMs6Ko');
-const WEB_APP_URL = 'https://t.me/USDTClickerminbot/app'; 
+const WEB_APP_URL = 'https://combat.onrender.com'; 
 
 // Обработка команды /start
 bot.start(async (ctx) => {
