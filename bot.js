@@ -72,7 +72,7 @@ const PromoCode = mongoose.model('PromoCode', PromoCodeSchema);
 // ==========================================
 // 3. Подключение к MongoDB
 // ==========================================
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/crypto-clicker', { 
+mongoose.connect('mongodb+srv://narekmxeyan2025_db_user:i1BDmGbtS0xg8RAO@cluster0.ucx8kac.mongodb.net/?appName=Cluster0', { 
   useNewUrlParser: true, 
   useUnifiedTopology: true 
 })
@@ -186,8 +186,8 @@ app.listen(PORT, () => {
 // ==========================================
 // 5. Инициализация Telegram Бота (Telegraf)
 // ==========================================
-const bot = new Telegraf(process.env.BOT_TOKEN || 'YOUR_BOT_TOKEN');
-const WEB_APP_URL = process.env.WEB_APP_URL || 'https://t.me/CryptoEvoClickerBot/app'; 
+const bot = new Telegraf('8318713550:AAHx6Itvy587qVLgTz9vC1c2dEF5ELMs6Ko');
+const WEB_APP_URL = 'https://t.me/USDTClickerminbot/app'; 
 
 // Обработка команды /start
 bot.start(async (ctx) => {
