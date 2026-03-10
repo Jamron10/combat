@@ -34,13 +34,6 @@ let CATEGORY_NAMES = { markets: 'Рынки', pr: 'PR & Команда', legal: 
 let TASK_CATEGORIES = { social: 'Соцсети', partners: 'Партнеры', ref: 'Рефералы' };
 
 let TASKS_DB = [
-  { id: 'tg_channel', title: 'Подписаться на ТГ Канал', category: 'social', link: 'https://t.me/telegram', reward: 5.0, icon: 'fa-telegram', iconColor: 'text-blue-400', bg: 'bg-blue-500/10' },
-  { id: 'tg_chat', title: 'Вступить в ТГ Чат', category: 'social', link: 'https://t.me/telegram', reward: 2.5, icon: 'fa-telegram', iconColor: 'text-blue-400', bg: 'bg-blue-500/10' },
-  { id: 'yt_sub', title: 'Подписаться на YouTube', category: 'social', reward: 10.0, icon: 'fa-youtube', iconColor: 'text-red-500', bg: 'bg-red-500/10' },
-  { id: 'x_follow', title: 'Читать в X (Twitter)', category: 'social', reward: 7.5, icon: 'fa-x-twitter', iconColor: 'text-white', bg: 'bg-gray-500/10' },
-  { id: 'invite_3', title: 'Пригласить 3 друзей', category: 'ref', reward: 50.0, icon: 'fa-user-group', iconColor: 'text-purple-400', bg: 'bg-purple-500/10' },
-  { id: 'blum', title: 'Играть в Blum', category: 'partners', reward: 25.0, icon: 'fa-gamepad', iconColor: 'text-pink-400', bg: 'bg-pink-500/10' },
-  { id: 'bybit', title: 'Регистрация на Bybit', category: 'partners', reward: 100.0, icon: 'fa-bitcoin', iconColor: 'text-yellow-500', bg: 'bg-yellow-500/10' },
 ];
 
 let UPGRADES_DB = [
