@@ -44,7 +44,7 @@ const TaskSchema = new mongoose.Schema({
   category: String,
   link: String,
   reward: Number,
-  maxCompletions: { type: Number, default: 0 }, // 0 = unlimited
+  maxCompletions: { type: Number, default: 0 },
   completionsCount: { type: Number, default: 0 },
   isActive: { type: Boolean, default: true }
 });
@@ -52,8 +52,8 @@ const TaskSchema = new mongoose.Schema({
 const TransactionSchema = new mongoose.Schema({
   telegramId: Number,
   type: { type: String, enum: ['deposit', 'withdrawal'] },
-  amount: Number, // В токенах ₮
-  network: String, // TON, TRC20, etc.
+  amount: Number,
+  network: String,
   walletAddress: String,
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   createdAt: { type: Date, default: Date.now }
@@ -75,7 +75,7 @@ const PromoCode = mongoose.model('PromoCode', PromoCodeSchema);
 // ==========================================
 // 3. Подключение к MongoDB
 // ==========================================
-mongoose.connect('mongodb+srv://narekai200_db_user:pe5R4YQzuyVhlDBn@cluster0.pkxl4xh.mongodb.net/?appName=Cluster0', { 
+mongoose.connect('mongodb+srv://narekai200_db_user:pe5R4YQzuyVhlDBn@cluster0.pkxl4xh.mongodb.net/crypto-clicker?appName=Cluster0', { 
   useNewUrlParser: true, 
   useUnifiedTopology: true 
 })
@@ -86,7 +86,6 @@ mongoose.connect('mongodb+srv://narekai200_db_user:pe5R4YQzuyVhlDBn@cluster0.pkx
 // 4. API Маршруты для Mini App (Фронтенда)
 // ==========================================
 
-// Получить данные пользователя или создать нового
 app.get('/api/user/:telegramId', async (req, res) => {
   try {
     const { telegramId } = req.params;
@@ -101,7 +100,6 @@ app.get('/api/user/:telegramId', async (req, res) => {
   }
 });
 
-// Синхронизация прогресса (сохранение баланса, энергии, карточек)
 app.post('/api/user/sync', async (req, res) => {
   try {
     const { telegramId, state } = req.body;
@@ -125,7 +123,6 @@ app.post('/api/user/sync', async (req, res) => {
   }
 });
 
-// Создать заявку на вывод
 app.post('/api/finance/withdraw', async (req, res) => {
   try {
     const { telegramId, amount, walletAddress, network } = req.body;
@@ -134,11 +131,9 @@ app.post('/api/finance/withdraw', async (req, res) => {
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
     if (user.balance < amount) return res.status(400).json({ success: false, message: 'Insufficient balance' });
 
-    // Списываем баланс
     user.balance -= amount;
     await user.save();
 
-    // Создаем транзакцию
     const tx = new Transaction({
       telegramId,
       type: 'withdrawal',
@@ -155,13 +150,11 @@ app.post('/api/finance/withdraw', async (req, res) => {
   }
 });
 
-// --- API для Админ Панели ---
 app.get('/api/admin/stats', async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
     const activeUsers = await User.countDocuments({ lastActive: { $gte: new Date(Date.now() - 24*60*60*1000) } });
     
-    // Агрегация для подсчета общего баланса
     const balanceAggr = await User.aggregate([{ $group: { _id: null, total: { $sum: "$balance" } } }]);
     const totalBalance = balanceAggr[0] ? balanceAggr[0].total : 0;
 
@@ -180,11 +173,9 @@ app.get('/api/admin/finance/pending', async (req, res) => {
   }
 });
 
-// Запуск Express Сервера
 app.listen(PORT, () => {
   console.log(`🌐 Express API сервер запущен на порту ${PORT}`);
 });
-
 
 // ==========================================
 // 5. Инициализация Telegram Бота (Telegraf)
@@ -192,7 +183,6 @@ app.listen(PORT, () => {
 const bot = new Telegraf('8318713550:AAHx6Itvy587qVLgTz9vC1c2dEF5ELMs6Ko');
 const WEB_APP_URL = 'https://combat.onrender.com'; 
 
-// Обработка команды /start
 bot.start(async (ctx) => {
   const telegramId = ctx.from.id;
   const username = ctx.from.username || '';
@@ -205,7 +195,6 @@ bot.start(async (ctx) => {
       let referredBy = null;
       if (startPayload && !isNaN(startPayload) && Number(startPayload) !== telegramId) {
         referredBy = Number(startPayload);
-        // Можно сразу начислить бонус рефереру здесь
       }
       user = new User({ telegramId, username, firstName, referredBy });
       await user.save();
