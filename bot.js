@@ -75,7 +75,7 @@ const PromoCode = mongoose.model('PromoCode', PromoCodeSchema);
 // ==========================================
 // 3. Подключение к MongoDB
 // ==========================================
-mongoose.connect('mongodb+srv://narekmxeyan2025_db_user:i1BDmGbtS0xg8RAO@cluster0.ucx8kac.mongodb.net/?appName=Cluster0', { 
+mongoose.connect('mongodb+srv://narekmxeyan2025_db_user:3IiwklihBaGtR5c7@cluster0.ucx8kac.mongodb.net/?appName=Cluster0', { 
   useNewUrlParser: true, 
   useUnifiedTopology: true 
 })
