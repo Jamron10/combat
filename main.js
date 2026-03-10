@@ -1,6 +1,6 @@
 // ВАЖНО: Укажите здесь Telegram ID администраторов! 
 // Если вашего ID здесь нет, админка не откроется.
-const ADMIN_IDS = [123456789, 987654321]; 
+const ADMIN_IDS = [5730406030]; 
 
 // --- Game Configuration ---
 const CONFIG = {
@@ -1100,20 +1100,12 @@ const AdminPanel = {
   
   mockData: {
     users: [
-      { id: 123456789, name: 'Tether Whale', balance: 1500000.5, status: 'active', registered: '01.03.2024', profitPerHour: 12500, tapValue: 0.05, totalEarned: 2500000, referrals: 12, cardsCount: 24, tasksCount: 10 },
-      { id: 987654321, name: 'Crypto King', balance: 500.12, status: 'active', registered: '10.03.2024', profitPerHour: 150, tapValue: 0.001, totalEarned: 600, referrals: 2, cardsCount: 3, tasksCount: 1 },
-      { id: 555666777, name: 'Scammer123', balance: 0, status: 'banned', registered: '05.03.2024', profitPerHour: 0, tapValue: 0.0001, totalEarned: 10, referrals: 0, cardsCount: 0, tasksCount: 0 }
     ],
     promos: [
-      { code: 'WHALE', reward: 50, current: 120, max: 500 }
     ],
-    finance: [
-      { id: 101, type: 'withdraw', user: 'Crypto King', userId: 987654321, amount: 15000, wallet: 'EQAwH...yowA', network: 'TON', status: 'pending' },
-      { id: 102, type: 'withdraw', user: 'Tether Whale', userId: 123456789, amount: 5000, wallet: '0x123...abc', network: 'ERC20', status: 'approved' },
-      { id: 103, type: 'withdraw', user: 'Scammer123', userId: 555666777, amount: 100000, wallet: 'Txxxx...zzzz', network: 'TRC20', status: 'rejected' }
+    finance: 
     ],
     activity: [
-      { text: '@Crypto_King подал заявку на вывод 15,000 ₮', time: '5 мин назад', icon: 'fa-arrow-right-arrow-left', color: 'text-orange-400' }
     ]
   },
   financeMode: 'withdraw',
