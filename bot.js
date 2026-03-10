@@ -11,6 +11,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const path = require('path');
+app.use(express.static(__dirname));
+
 const PORT = process.env.PORT || 3000;
 
 // ==========================================
